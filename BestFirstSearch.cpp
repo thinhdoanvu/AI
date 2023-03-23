@@ -36,9 +36,17 @@ void swap(int &x, int &y){
 }
 
 void BestFristSearch(int start, int end){
-	int visited[n]={0};
+	int visited[n];
+	for(int i=0;i<n;i++){
+		visited[i]=0;
+	}
+	int parent[n];
+	for(int i=0;i<n;i++){
+		parent[i]=-1;
+	}
 	int N=start;
 	visited[start]=1;
+	parent[start]=-1;
 	int Tn[n];
 	int dem=0;
 	int Open[n];
@@ -54,6 +62,7 @@ void BestFristSearch(int start, int end){
 		for(int i=0; i<n; i++){
 			if(dt[N][i]!=-1 && visited[i]==0){
 				Tn[count++]=i;
+				parent[i]=N;
 				//luu gia tri trong so tuong ung dinh vao Sort, dinh i noi vao Open
 				Sort[dem]=dt[N][i];
 				Open[dem]=i;
@@ -103,7 +112,15 @@ void BestFristSearch(int start, int end){
 		printf("%3d",visited[i]);
 	}
 	if(dem>0){
-		printf("\nTim thay duong di tu start: %d - end: %d",start,end);	
+		 // In ra duong di bang cach in nguoc danh sach tu start
+	    int path[n], len = 0;
+	    for (int i = end; i != -1; i = parent[i]) {
+	        path[len++] = i;
+	    }
+	    printf("\nDuong di tu %d den %d: ", start, end);
+	    for (int i = len - 1; i >= 0; i--) {
+	        printf("%d ", path[i]);
+	    }	
 	}
 	else{
 		printf("\nKhong tim thay duong di tu start: %d - end: %d",start,end);
