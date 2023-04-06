@@ -1,495 +1,179 @@
 #include<stdio.h>
-#include<math.h>
-#define maxdinh 3
+//#define dinh_input "Astar_graph.inp"
+//#define h_input "Astar_graph.h"
+#define dinh_input "Astar_graph2.inp"
+#define h_input "Astar_graph2.h"
+#define maxdinh 20//so dinh toi da
 
-#define INPUT "Astar.inp"
 //khai bao bien
-FILE *fp;
-int S[maxdinh][maxdinh];
-int E[3][3]={{1,2,3},{4,5,6},{7,8,0}};
-int n;//so hang/cot
-int g=0;
+int dinh[maxdinh][maxdinh];
+int h[maxdinh];
+int n;//so dinh
+FILE *fp;//con tro tap tin
 
 void readfile(){
-	fp=fopen(INPUT,"r");	
-	if(fp==NULL){
-		printf("File not found");
-	}
-	else{
-		fscanf(fp,"%d",&n);
-		for(int i=0;i<n;i++){
-			for(int j=0;j<n;j++){
-				fscanf(fp,"%d",&S[i][j]);
-			}
-		}
-	}
-	fclose(fp);
-}
-
-void inmang(int a[][maxdinh]){
+	//doc ma tran trong so cua cac dinh
+	fp=fopen(dinh_input,"r");
+	if(fp==NULL) printf("File not found");
+	fscanf(fp,"%d",&n);
+	printf("So dinh: %d",n);
 	for(int i=0; i<n; i++){
 		for(int j=0; j<n; j++){
-			printf("%3d",a[i][j]);	
+			fscanf(fp,"%d",&dinh[i][j]);	
+		}
+	}
+	fclose(fp);//dong tap tin dinh_input
+
+	//gia tri uoc luong heuristic cac dinh tu i - K
+	fp=fopen(h_input,"r");
+	if(fp==NULL) printf("File not found");
+	fscanf(fp,"%d",&n);
+	for(int i=0; i<n; i++){
+		fscanf(fp,"%d",&h[i]);	
+	}
+	fclose(fp);//dong tap tin h_input
+	
+	//in ra ma tran trong so cac dinh
+	printf("\nTrong so cua ma tran:\n");
+	for(int i=0; i<n; i++){
+		for(int j=0; j<n; j++){
+			printf("%5d",dinh[i][j]);
 		}
 		printf("\n");
 	}
+	
+	//in ra gia tri cac heuristic
+	printf("gia tri uoc luong: \n");
+	for(int i=0; i<n; i++){
+		printf("%5d",h[i]);
+	}
 }
 
-int h(int a1[][maxdinh], int a2[][maxdinh]){
-	int distance=0;
-	for(int i=0; i<n; i++){
-		for(int j=0; j<n; j++){
-			distance+= abs(a1[i][j] - a2[i][j]);
+void inmang(int a[], int size){
+	for(int i=0; i<size; i++){
+		printf("%3d",a[i]);
+	}
+	printf("\n");
+}
+
+void khoitao(int a[], int size, int byte){
+	for(int i=0; i<size; i++){
+		a[i]=byte;
+	}
+}
+void Astar_Search(int start, int goal){
+	printf("\nDuong di ngan nhat A(0) den K(11) la:\n");
+	int OPEN[maxdinh];
+	int CLOSE[maxdinh];
+	int g[maxdinh];
+	int f[maxdinh];
+	int father[maxdinh];
+	khoitao(g,n,-1);
+	khoitao(f,n,-1);
+	khoitao(CLOSE,n,-1);
+	khoitao(father,n,-1);
+	
+	int dem=0;
+	int numclose=0;
+	g[start] = 0;
+	f[start] = h[start];
+	
+	//OPEN = rong
+	//khoi tao dinh dau tien
+	int u=start;
+	while(u!=goal){
+		printf("\nu = %d\n",u);
+		if(dem<0){
+			printf("\nKhong tim thay duong duong di ngan nhat tu %d den %d",start,goal);
 		}
-	}	
-	return distance;
-}
-
-int find(int a[][maxdinh]){
-	int row = -1;
-	int col = -1;
-	for(int i=0; i<n; i++){
-		for(int j=0; j<n; j++){
-			if(a[i][j]==0){
-				row = i;
-				col = j;
-				break;
+		else{
+			CLOSE[numclose]=u;
+			father[numclose] = u;//father(v') = u
+			numclose++;
+			int visited[n];
+			khoitao(visited,n,-1);
+			for(int i=0; i<n; i++){//duyet qua cac dinh
+				if(dinh[u][i]!=0){//2 dinh ke nhau co duong di
+					g[i]=g[u]+dinh[u][i];
+					f[i]=g[i]+h[i];
+					visited[i]=i;
+				}
+			}
+			printf("visited[]: ");
+			inmang(visited,n);
+			//kiem tra cac dinh trong OPEN co trung voi cac dinh da dua vao tap g[] hoac f[] chua
+			for(int i=0; i<n; i++){//v trong visited
+				for(int j=0; j<dem; j++){//v' trong OPEN
+					if(visited[i]!=-1 && OPEN[j]==visited[i]){
+						printf("\ni: %d, j: %d, visited: %d = OPEN: %d\n",i,j,visited[i],OPEN[j]);
+						printf("f[v/i/visited]=%d < f[v'/j/OPEN]=%d\n",f[i],f[j]);
+						if(f[i] < f[j]){//f(v)<f(v')
+							g[j] = g[i];//g(v')=g(v)
+							f[j] = f[i];//f(v')=f(v)
+//							father[j] = u;//father(v') = u
+						}
+					}
+				}
+			}
+			//kiem tra cac dinh trong CLOSE co trung voi cac dinh da dua vao tap g[] hoac f[] chua
+			for(int i=0; i<n; i++){//v trong visited
+				for(int j=0; j<numclose; j++){//v' trong CLOSE
+					if(visited[i]!=-1 && CLOSE[j]==visited[i]){
+						printf("\ni: %d, j: %d, visited: %d = CLOSE: %d\n",i,j,visited[i],CLOSE[j]);
+						printf("f[v/i/visited]=%d < f[v'/j/CLOSE]=%d\n",f[i],f[j]);
+						if(f[i] < f[j]){//f(v)<f(v')
+							g[j] = g[i];//g(v')=g(v)
+							f[j] = f[i];//f(v')=f(v)
+//							father[j] = u;//father(v') = u
+						}
+					}
+				}
+			}
+			//chen cac dinh v khong thuoc OPEN va CLOSE vao OPEN
+			for(int i=0; i<n; i++){
+				if(visited[i]!=-1){
+					OPEN[dem++]=i;
+				}
+			}
+			//sap xep OPEN theo thu tu giam dan
+			for(int i=0; i<dem-1; i++){
+				for(int j=i+1; j<dem; j++){
+					if(f[OPEN[i]] < f[OPEN[j]]){
+						int tam = OPEN[i];
+						OPEN[i] = OPEN[j];
+						OPEN[j]=tam;
+					}
+				}
 			}
 		}
+//		break;
+		printf("OPEN[]: ");
+		inmang(OPEN,dem);
+		printf("g[]:");
+		inmang(g,n);
+		printf("f[]:");
+		inmang(f,n);
+		printf("CLOSE[]:");
+		inmang(CLOSE,numclose);
+		printf("father[]: ");
+		inmang(father,numclose);
+		//lay dinh u ra khoi OPEN (nam o cuoi)
+		u=OPEN[--dem];
 	}
-	if(row!= -1 && col!= -1){
-		return(row*3+col);//vi tri tinh tu trai qua phai tu tren tinh xuong
+	if(u==goal){
+		printf("\nTim thay duong di ngan nhat tu %d den %d: ",start,goal);
 	}
-	else{
-		return -1;
+	//in duong di ngan ngan tu start toi goal
+	for(int i=0; i<numclose; i++){
+		printf("%d ->",father[i]);
 	}
-}
-
-void swap(int &x, int &y){
-	int tam=x;
-	x=y;
-	y=tam;
-}
-
-void duplicate(int a[][maxdinh], int b[][maxdinh]){
-	for(int i=0; i<maxdinh; i++){
-		for(int j=0; j<maxdinh; j++){
-			b[i][j]=a[i][j];
-		}
-	}
-}
-
-int equal(int a[][maxdinh], int b[][maxdinh]){
-	for(int i=0; i<maxdinh; i++){
-		for(int j=0; j<maxdinh; j++){
-			if(a[i][j] != b[i][j]){
-				return 0;
-			}
-		}
-	}
-	return 1;
-}
-
-void puzzle(int S[][maxdinh], int E[][maxdinh], int g){
-	if(equal(S,E)==1){
-		printf("\nbai toan da duoc giai");
-		return;
-	}
-
-	int row = (find(S)/3);
-	int col = (find(S)%3);
-	printf("\nVi tri so 0 trong S: (row = %d, col = %d)",row,col);
+	printf("%d",goal);
 	
-	//cac truong hop chuyen doi ma tran tu ma tran ban dau
-	//---------------------------- hang 0 cot 0 -------------------//
-	if(col==0 && row ==0){//hang 0, cot 0
-		int T1[maxdinh][maxdinh];//xuong duoi
-		int T2[maxdinh][maxdinh];//sang phai
-		
-		//dich chuyen xuong duoi
-		duplicate(S,T1);
-		swap(T1[row][col],T1[row+1][col]);
-		//printf("\nPuzzle H1: \n");
-		//inmang(T1);
-		int h1 = g+h(T1,E);//tinh khoang cach T1 - End
-		//printf("h1 = %d",h1);
-		
-		//dich chuyen sang phai
-		duplicate(S,T2);
-		swap(T2[row][col],T2[row][col+1]);
-		//printf("\nPuzzle H2: \n");
-		//inmang(T2);
-		int h2 = g+h(T2,E);//tinh khoang cach T2 - End
-		//printf("h2 = %d",h2);
-		
-		//tim hmin
-		if(h1 < h2){
-			duplicate(T1,S);//S=T1	
-		}
-		else{
-			duplicate(T2,S);//S=T2
-		}
-		printf("\nPuzzle new: \n");
-		inmang(S);
-		
-		//return;
-	}
-	//---------------------------- hang 0 cot 1 -------------------//
-	if(col==1 && row ==0){//hang 0, cot 1
-		int T1[maxdinh][maxdinh];//duoi
-		int T2[maxdinh][maxdinh];//trai
-		int T3[maxdinh][maxdinh];//phai
-		//dich chuyen xuong duoi
-			
-		duplicate(S,T1);
-		swap(T1[row][col],T1[row+1][col]);
-		//printf("\nPuzzle H1: \n");
-		//inmang(T1);
-		int h1 = g+h(T1,E);//tinh khoang cach T1 - End
-		//printf("h1 = %d",h1);
-		
-		//dich chuyen sang phai
-		duplicate(S,T2);
-		swap(T2[row][col],T2[row][col+1]);
-		//printf("\nPuzzle H2: \n");
-		//inmang(T2);
-		int h2 = g+h(T2,E);//tinh khoang cach T2 - End
-		//printf("h2 = %d",h2);
-		
-		//dich chuyen sang trai
-		duplicate(S,T3);
-		swap(T3[row][col],T3[row][col-1]);
-		//printf("\nPuzzle H3: \n");
-		//inmang(T3);
-		int h3 = g+h(T3,E);//tinh khoang cach T3 - End
-		//printf("h3 = %d",h3);
-		
-		//tim min
-		int min=h1;
-		if(min > h2){
-			min = h2;
-		}
-		if(min > h3){
-			min = h3;
-		}
-		
-		if(min == h1) duplicate(T1,S);//S=T1
-		if(min == h2) duplicate(T2,S);//S=T2
-		if(min == h3) duplicate(T3,S);//S=T3
-
-		printf("\nPuzzle new: \n");
-		inmang(S);
-		
-		//return;
-	}
-	
-	//---------------------------- hang 0 cot 2 -------------------//
-	if(col==2 && row ==0){//hang 0, cot 2
-		int T1[maxdinh][maxdinh];//duoi
-		int T2[maxdinh][maxdinh];//trai		
-		//dich chuyen xuong duoi
-		duplicate(S,T1);
-		swap(T1[row][col],T1[row+1][col]);
-		//printf("\nPuzzle H1: \n");
-		//inmang(T1);
-		int h1 = g+h(T1,E);//tinh khoang cach T1 - End
-		//printf("h1 = %d",h1);
-		
-		//dich chuyen sang trai
-		duplicate(S,T2);
-		swap(T2[row][col],T2[row][col-1]);
-		//printf("\nPuzzle H2: \n");
-		//inmang(T2);
-		int h2 = g+h(T2,E);//tinh khoang cach T2 - End
-		//printf("h2 = %d",h2);
-		
-		//tim hmin
-		if(h1 < h2){
-			duplicate(T1,S);//S=T1	
-		}
-		else{
-			duplicate(T2,S);//S=T2
-		}
-		printf("\nPuzzle new: \n");
-		inmang(S);
-		
-		//return;
-	}
-	//---------------------------- hang 1 cot 0 -------------------//
-	if(col==0 && row ==1){//hang 1, cot 0
-		int T1[maxdinh][maxdinh];//duoi
-		int T2[maxdinh][maxdinh];//phai
-		int T3[maxdinh][maxdinh];//tren
-		//dich chuyen xuong duoi
-		duplicate(S,T1);
-		swap(T1[row][col],T1[row+1][col]);
-		//printf("\nPuzzle H1: \n");
-		//inmang(T1);
-		int h1 = g+h(T1,E);//tinh khoang cach T1 - End
-		//printf("h1 = %d",h1);
-		
-		//dich chuyen sang phai
-		duplicate(S,T2);
-		swap(T2[row][col],T2[row][col+1]);
-		//printf("\nPuzzle H2: \n");
-		//inmang(T2);
-		int h2 = g+h(T2,E);//tinh khoang cach T2 - End
-		//printf("h2 = %d",h2);
-		
-		//dich chuyen len tren
-		duplicate(S,T3);
-		swap(T3[row][col],T3[row-1][col]);
-		//printf("\nPuzzle H3: \n");
-		//inmang(T3);
-		int h3 = g+h(T3,E);//tinh khoang cach T3 - End
-		//printf("h3 = %d",h3);
-		
-		//tim min
-		int min=h1;
-		if(min > h2){
-			min = h2;
-		}
-		if(min > h3){
-			min = h3;
-		}
-		
-		if(min == h1) duplicate(T1,S);//S=T1
-		if(min == h2) duplicate(T2,S);//S=T2
-		if(min == h3) duplicate(T3,S);//S=T3
-
-		printf("\nPuzzle new: \n");
-		inmang(S);
-		
-		//return;
-	}
-	//---------------------------- hang 1 cot 1 -------------------//
-	if(col==1 && row ==1){//hang 1, cot 1
-		int T1[maxdinh][maxdinh];//duoi
-		int T2[maxdinh][maxdinh];//phai
-		int T3[maxdinh][maxdinh];//tren
-		int T4[maxdinh][maxdinh];//trai
-		//dich chuyen xuong duoi
-		duplicate(S,T1);
-		swap(T1[row][col],T1[row+1][col]);
-		//printf("\nPuzzle H1: \n");
-		//inmang(T1);
-		int h1 = g+h(T1,E);//tinh khoang cach T1 - End
-		//printf("h1 = %d",h1);
-		
-		//dich chuyen sang phai
-		duplicate(S,T2);
-		swap(T2[row][col],T2[row][col+1]);
-		//printf("\nPuzzle H2: \n");
-		//inmang(T2);
-		int h2 = g+h(T2,E);//tinh khoang cach T2 - End
-		//printf("h2 = %d",h2);
-		
-		//dich chuyen len tren
-		duplicate(S,T3);
-		swap(T3[row][col],T3[row-1][col]);
-		//printf("\nPuzzle H3: \n");
-		//inmang(T3);
-		int h3 = g+h(T3,E);//tinh khoang cach T3 - End
-		//printf("h3 = %d",h3);
-		
-		//dich chuyen sang trai
-		duplicate(S,T4);
-		swap(T4[row][col],T4[row][col-1]);
-		//printf("\nPuzzle H4: \n");
-		//inmang(T4);
-		int h4 = g+h(T4,E);//tinh khoang cach T2 - End
-		//printf("h4 = %d",h4);
-		//tim min
-		int min=h1;
-		if(min > h2){
-			min = h2;
-		}
-		if(min > h3){
-			min = h3;
-		}
-		if(min > h4){
-			min = h4;
-		}
-		if(min == h1) duplicate(T1,S);//S=T1
-		if(min == h2) duplicate(T2,S);//S=T2
-		if(min == h3) duplicate(T3,S);//S=T3
-		if(min == h4) duplicate(T4,S);//S=T3
-		printf("\nPuzzle new: \n");
-		inmang(S);
-		
-		//return;
-	}
-	//---------------------------- hang 1 cot 2 -------------------//
-	if(col==2 && row ==1){//hang 1, cot 2
-		int T1[maxdinh][maxdinh];//duoi
-		int T2[maxdinh][maxdinh];//trai	
-		int T3[maxdinh][maxdinh];//tren	
-		//dich chuyen xuong duoi
-		duplicate(S,T1);
-		swap(T1[row][col],T1[row+1][col]);
-		//printf("\nPuzzle H1: \n");
-		//inmang(T1);
-		int h1 = g+h(T1,E);//tinh khoang cach T1 - End
-		//printf("h1 = %d",h1);
-		
-		//dich chuyen sang trai
-		duplicate(S,T2);
-		swap(T2[row][col],T2[row][col-1]);
-		//printf("\nPuzzle H2: \n");
-		//inmang(T2);
-		int h2 = g+h(T2,E);//tinh khoang cach T2 - End
-		//printf("h2 = %d",h2);
-		
-		//dich chuyen len tren
-		duplicate(S,T3);
-		swap(T3[row][col],T3[row-1][col]);
-		//printf("\nPuzzle H3: \n");
-		//inmang(T3);
-		int h3 = g+h(T3,E);//tinh khoang cach T3 - End
-		//printf("h3 = %d",h3);
-		
-		//tim min
-		int min=h1;
-		if(min > h2){
-			min = h2;
-		}
-		if(min > h3){
-			min = h3;
-		}
-		
-		if(min == h1) duplicate(T1,S);//S=T1
-		if(min == h2) duplicate(T2,S);//S=T2
-		if(min == h3) duplicate(T3,S);//S=T3
-
-		printf("\nPuzzle new: \n");
-		inmang(S);
-		
-		//return;
-	}
-	//---------------------------- hang 2 cot 0 -------------------//
-	if(col==0 && row ==2){//hang 2, cot 0
-		int T1[maxdinh][maxdinh];//len tren
-		int T2[maxdinh][maxdinh];//sang phai
-		
-		//dich chuyen len tren
-		duplicate(S,T1);
-		swap(T1[row][col],T1[row-1][col]);
-		//printf("\nPuzzle H1: \n");
-		//inmang(T1);
-		int h1 = g+h(T1,E);//tinh khoang cach T1 - End
-		//printf("h1 = %d",h1);
-		
-		//dich chuyen sang phai
-		duplicate(S,T2);
-		swap(T2[row][col],T2[row][col+1]);
-		//printf("\nPuzzle H2: \n");
-		//inmang(T2);
-		int h2 = g+h(T2,E);//tinh khoang cach T2 - End
-		//printf("h2 = %d",h2);
-		
-		//tim hmin
-		if(h1 < h2){
-			duplicate(T1,S);//S=T1	
-		}
-		else{
-			duplicate(T2,S);//S=T2
-		}
-		printf("\nPuzzle new: \n");
-		inmang(S);
-		
-		//return;
-	}
-	//---------------------------- hang 2 cot 1 -------------------//
-	if(col==1 && row ==2){//hang 1, cot 2
-		int T1[maxdinh][maxdinh];//phai
-		int T2[maxdinh][maxdinh];//trai	
-		int T3[maxdinh][maxdinh];//tren	
-		//dich chuyen sang phai
-		duplicate(S,T1);
-		swap(T1[row][col],T1[row][col+1]);
-		//printf("\nPuzzle H1: \n");
-		//inmang(T1);
-		int h1 = g+h(T1,E);//tinh khoang cach T1 - End
-		//printf("h1 = %d",h1);
-		
-		//dich chuyen sang trai
-		duplicate(S,T2);
-		swap(T2[row][col],T2[row][col-1]);
-		//printf("\nPuzzle H2: \n");
-		//inmang(T2);
-		int h2 = g+h(T2,E);//tinh khoang cach T2 - End
-		//printf("h2 = %d",h2);
-		
-		//dich chuyen len tren
-		duplicate(S,T3);
-		swap(T3[row][col],T3[row-1][col]);
-		//printf("\nPuzzle H3: \n");
-		//inmang(T3);
-		int h3 = g+h(T3,E);//tinh khoang cach T3 - End
-		//printf("h3 = %d",h3);
-		
-		//tim min
-		int min=h1;
-		if(min > h2){
-			min = h2;
-		}
-		if(min > h3){
-			min = h3;
-		}
-		
-		if(min == h1) duplicate(T1,S);//S=T1
-		if(min == h2) duplicate(T2,S);//S=T2
-		if(min == h3) duplicate(T3,S);//S=T3
-
-		printf("\nPuzzle new: \n");
-		inmang(S);
-		
-		//return;
-	}
-	//---------------------------- hang 2 cot 2 -------------------//
-	if(col==0 && row ==2){//hang 2, cot 0
-		int T1[maxdinh][maxdinh];//len tren
-		int T2[maxdinh][maxdinh];//sang trai
-		
-		//dich chuyen len tren
-		duplicate(S,T1);
-		swap(T1[row][col],T1[row-1][col]);
-		//printf("\nPuzzle H1: \n");
-		//inmang(T1);
-		int h1 = g+h(T1,E);//tinh khoang cach T1 - End
-		//printf("h1 = %d",h1);
-		
-		//dich chuyen sang trai
-		duplicate(S,T2);
-		swap(T2[row][col],T2[row][col-1]);
-		//printf("\nPuzzle H2: \n");
-		//inmang(T2);
-		int h2 = g+h(T2,E);//tinh khoang cach T2 - End
-		//printf("h2 = %d",h2);
-		
-		//tim hmin
-		if(h1 < h2){
-			duplicate(T1,S);//S=T1	
-		}
-		else{
-			duplicate(T2,S);//S=T2
-		}
-		printf("\nPuzzle new: \n");
-		inmang(S);
-		
-		//return;
-	}
-	puzzle(S,E,g++);
 }
 
 int main(){
-	printf("Puzzle khoi tao: \n");
 	readfile();
-	inmang(S);
-	//printf("\nPuzzle ket qua: \n");
-	//inmang(E);
-	//tim vi tri cua so 0
-	puzzle(S,E,g);
-	
-	return 0;
+//	Astar_Search(0,10);
+	Astar_Search(0,12);
+	return 0;//exit
 }
