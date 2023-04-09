@@ -2,6 +2,8 @@
 #define maxdinh 20
 #define matranke "Leodoi_1.mtk"//bai11
 #define heuristic "Leodoi_1.h"//bai11
+//#define matranke "Leodoi_2.mtk"//bai15
+//#define heuristic "Leodoi_2.h"//bai15
 
 int h[maxdinh];
 int mtk[maxdinh][maxdinh];
@@ -62,16 +64,19 @@ void HillClimping(int start, int goal){
 	int u = start;
 	int dem=0;
 	int demclose=0;
-	OPEN[dem++]=start;
+	//OPEN[dem++]=start;
 	int parent[n];
+	int visited[n];
 	for(int i=0;i<n;i++){
 		parent[i]=-1;
+		visited[i]=-1;
 	}
 	while(u!=goal){
 		for(int i=0; i<n; i++){
-			if(mtk[u][i]==1){
+			if(mtk[u][i]==1 && visited[i]==-1){
 				OPEN[dem++]=i;
 				parent[i]=u;
+				visited[u]=1;
 			}
 		}
 		//in danh sach OPEN truoc SX
@@ -119,6 +124,7 @@ void HillClimping(int start, int goal){
 
 int main(){
 	readfile();
-	HillClimping(0,5);
+	HillClimping(0,7);//bai 11
+//	HillClimping(0,13);//bai 15
 	return 0;
 }
