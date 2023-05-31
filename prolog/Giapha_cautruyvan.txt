@@ -77,6 +77,19 @@ X = giandinhde ;
 X = duongnhatle ;
 false.
 
-?- anh_em_ho(tranquangde,X). %Trong truong hop chi quan tam cha ma khong quan tam den Me
+?- anh_em_ho(tranphede,X).
+X = tranthuantong ;
+X = tranngac ;
+X = giandinhde ;
+X = duongnhatle ;
+X = hohanthuong ;
+X = lethanhngau ;
+X = tranthuantong ;
+X = tranngac ;
+X = giandinhde ;
+X = duongnhatle ;
+false.
+
+?- anh_em_ho(tranquangde,X).
 X = tranthieude ;
 false.
