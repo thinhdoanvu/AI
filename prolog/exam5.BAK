@@ -1,0 +1,12 @@
+%viet chuong trinh tinh a luy thua b
+power(A,0,RES):-
+  RES is 1.
+  
+power(A,1,RES):-
+  RES is A.
+
+power(A,B,RES):-
+  B>1,
+  NEWB is B-1,
+  power(A,NEWB,TEMP),
+  RES is A*TEMP.

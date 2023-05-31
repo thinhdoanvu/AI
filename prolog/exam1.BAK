@@ -1,0 +1,6 @@
+%CSTT: A.Thinh
+%25-May-2023
+
+la_nguoi(socrates).        %socrates la nguoi
+phai_chet(X):-la_nguoi(X). %la nguoi thi ai cung ph?i ch?t
+

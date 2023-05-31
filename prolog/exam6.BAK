@@ -1,0 +1,13 @@
+%giai phuong trinh bac 1: ax +b = c
+ptb1(0,B,C,X):-
+  B==C,
+  write("Phuong trinh co vo so nghiem").
+
+ptb1(0,B,C,X):-
+  B\==C,
+  write("Phuong trinh vo nghiem").
+  
+ptb1(A,B,C,X):-
+  TAM is C-B,
+  X = TAM/A,
+  format("Nghiem cua pt la ~2f",[X]).
