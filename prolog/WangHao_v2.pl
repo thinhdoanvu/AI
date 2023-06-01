@@ -32,7 +32,7 @@ prove([L|P],[R|A]):- %L,R: bieu thuc logic can CM; P,A: phan con lai sau CM
   wang(L,R),
   prove(P,A).
 
-% Procedure of Wang to prove theorem.
+%Giai quyet thuat toan.
 wang(L,R):-         %neu ton tai rules(L,R) -> 'TRUE'
   rules(L,R),
   write('TRUE').
@@ -48,7 +48,7 @@ wang(_,_):-         %khi khong con quy tac nao nua: FALSE
 rules(L,R):-
   member(!X,L),       %neu tim thay phu cua X cua danh sach ben trai
   select(!X,L,Ld),    %Xoa !X ra khoi L va luu ket qua vao Ld
-  rules(Ld,[X|R]).    %De quy viec xoa phu dinh cua X voi X=Ld
+  rules(Ld,[X|R]).    %De quy viec xoa phu dinh cua X voi X noi vao dau R
 
 %RULE1b: Chuyen ky hieu not (phu) tu ve right sang ve left.
 %p -> !q,r <=> p,q->r
@@ -138,6 +138,6 @@ Cho p->q, q->r. CMR p->r
 prove([[(p->q),(q->r)]],[[(p->r)]]).  %true
 prove([[(a&b->c),(b&c->d),(a&b)]],[d]). %false
 prove([[(a->b),(a->c v e),(b & c->d),(f->d),(a)]],[g]).
-prove([(a -> b v d),(d -> e & f),(e & a -> !b)],[(a -> !d)]).
+prove([(a -> b v d),(d -> e & f),(e & a -> !b)],[(a -> !d)]).  %false
 
 */
