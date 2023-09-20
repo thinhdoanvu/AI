@@ -1,0 +1,61 @@
+% Define operators.
+:- op(700, xfy, '->').
+:- op(600, xfy, '&').
+:- op(500, fy, '!').
+
+% Main proof function.
+prove(Left, Right) :-
+    nl, write(Left), write(' |= '), write(Right), nl,
+    robinson(Left, Right, []).
+
+% Robinson algorithm.
+robinson(Left, Right, _) :-
+    member(Clause, Right),
+    member(Clause, Left),
+    !.
+robinson(Left, Right, _) :-
+    member(Clause, Left),
+    member(Clause, Right),
+    !.
+robinson(Left, Right, Substitutions) :-
+    member(Clause, Left),
+    resolve(Clause, Left, Right, Substitutions, NewLeft, NewRight),
+    robinson(NewLeft, NewRight, [Clause | Substitutions]).
+
+% Resolution rule.
+resolve(Clause, Left, Right, Substitutions, NewLeft, NewRight) :-
+    select(Literal, Left, TempLeft),
+    member(!Literal, Right),
+    substitute(Clause, Literal, Substitutions, NewClause),
+    select(!Literal, Right, TempRight),
+    append(TempLeft, TempRight, NewLeft),
+    append([NewClause], NewRight, NewLeft).
+
+% Substitution.
+substitute(Clause, Literal, Substitutions, NewClause) :-
+    substitute_literal(Clause, Literal, Substitutions, TempClause),
+    sort(TempClause, NewClause).
+
+substitute_literal([], _, _, []).
+substitute_literal([Literal | Tail], Literal, Substitutions, [SubLiteral | NewTail]) :-
+    apply_substitutions(Literal, Substitutions, SubLiteral),
+    substitute_literal(Tail, Literal, Substitutions, NewTail).
+substitute_literal([OtherLiteral | Tail], Literal, Substitutions, [OtherLiteral | NewTail]) :-
+    OtherLiteral \= Literal,
+    substitute_literal(Tail, Literal, Substitutions, NewTail).
+
+apply_substitutions(Literal, [], Literal).
+apply_substitutions(Literal, [Substitution | Substitutions], NewLiteral) :-
+    apply_substitution(Literal, Substitution, TempLiteral),
+    apply_substitutions(TempLiteral, Substitutions, NewLiteral).
+
+apply_substitution(Literal, (Term, Replacement), NewLiteral) :-
+    replace(Term, Replacement, Literal, NewLiteral).
+
+replace(_, _, [], []).
+replace(Term, Replacement, [Term | Tail], [Replacement | NewTail]) :-
+    replace(Term, Replacement, Tail, NewTail).
+replace(Term, Replacement, [OtherTerm | Tail], [OtherTerm | NewTail]) :-
+    OtherTerm \= Term,
+    replace(Term, Replacement, Tail, NewTail).
+

@@ -1,0 +1,95 @@
+?- vua(X). %ai da tung lam vua
+X = tranminhtong ;
+X = hoquyly ;
+X = trannghetong ;
+X = trandutong ;
+X = tranhientong ;
+X = trandutong ;
+X = tranthuantong ;
+X = tranphede ;
+X = hohanthuong ;
+X = tranthieude ;
+X = tranquangde ;
+false.
+
+?- con_trai_bo(trannghetong,X). %tran nghe tong la con trai cua ai
+X = tranminhtong ;
+false.
+
+?- con_trai_bo(X,tranminhtong). %ai la con trai cua tran minh tong
+X = trannghetong ;
+X = trandutong ;
+X = tranhientong ;
+X = tranduetong ;
+X = cungtuc ;
+false.
+
+?- con_trai_me(X,hientu).%ai la con trai cua me hien tu
+X = trannghetong ;
+X = trandutong ;
+X = tranhientong ;
+X = tranduetong ;
+X = cungtuc ;
+false.
+
+?- con_gai_me(X,hientu). %ai la con gai me hien tu
+X = huyninh ;
+false.
+
+?- con_gai_me(huyninh,X). %huy ninh la con gai cua ai
+X = hientu ;
+false.
+
+?- con(X,tranminhtong). %Ai la con cua tran minh tong
+X = huyninh ;
+X = trannghetong ;
+X = trandutong ;
+X = tranhientong ;
+X = tranduetong ;
+X = cungtuc ;
+false.
+
+?- con(huyninh,X). %huy ninh la con cua ai
+X = tranminhtong ;
+X = hientu ;
+false.
+
+?- hoanghau(X). %Ai la hoang hau tri vi
+X = hientu ;
+X = huyninh ;
+X = thuctu ;
+X = giatu ;
+X = lethanhngau ;
+false.
+
+?- anh_em_ruot(X,giandinhde). %Ai la anh em ruot voi gian dinh de
+X = tranthuantong ;
+X = tranngac ;
+X = giandinhde ;
+false.
+
+?- anh_em_ho(tranphede,X).%Ai la anh em ho vơi tranphede
+X = hohanthuong ;
+X = lethanhngau ;
+X = tranthuantong ;
+X = tranngac ;
+X = giandinhde ;
+X = duongnhatle ;
+false.
+
+?- anh_em_ho(tranphede,X).
+X = tranthuantong ;
+X = tranngac ;
+X = giandinhde ;
+X = duongnhatle ;
+X = hohanthuong ;
+X = lethanhngau ;
+X = tranthuantong ;
+X = tranngac ;
+X = giandinhde ;
+X = duongnhatle ;
+false.
+
+?- anh_em_ho(tranquangde,X).
+X = tranthieude ;
+false.
