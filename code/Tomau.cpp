@@ -1,7 +1,7 @@
 #include<stdio.h>
 #define maxdinh 10
 #define INPUT "Tomau.inp"
-//#define INPUT "Tomau.inp2"
+// #define INPUT "Tomau.inp2"
 
 int sodinh;
 int dinh[maxdinh][maxdinh];

@@ -1,0 +1,14 @@
+7
+1 1 0 1 0 0 0
+1 1 1 1 0 0 0
+0 1 1 1 1 0 0
+1 1 1 1 1 1 0
+0 0 1 1 1 1 0
+0 0 0 1 1 1 0
+0 0 0 0 0 0 1
+
+//so dinh cua do thi: 7
+//dinh 0 - noi voi dinh 0=> gia tri [0,0]=1
+//dinh 0 - noi voi dinh 1 => gia tri [0,1]=1
+//dinh 0 - khong ket noi voi dinh 2 => gia tri =0 [0,2]
+...

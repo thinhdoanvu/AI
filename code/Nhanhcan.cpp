@@ -146,6 +146,6 @@ void nhanhcan(int start, int goal){
 
 int main(){
 	readfile();
-	nhanhcan(0,11);
+	nhanhcan(0,7);
 	return 0;
 }
