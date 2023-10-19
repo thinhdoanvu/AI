@@ -1,7 +1,7 @@
 #include<stdio.h>
 #define MAX_J 100
 #define MAX_M 100
-#define INPUT "Xeplich.inp4"
+#define INPUT "Xeplich.inp"
 
 //khai bao bien
 int somay;

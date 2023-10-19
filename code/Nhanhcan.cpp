@@ -59,9 +59,9 @@ void readfile(){
 	inmang(h,n);
 }
 
-void khoitaomang(int a[], int n){
+void khoitaomang(int a[], int n, int value){
 	for(int i=0; i<n; i++){
-		a[i]=0;
+		a[i]=value;
 	}
 }
 
@@ -73,12 +73,13 @@ void nhanhcan(int start, int goal){
 	int g[n];
 	int f[n];
 	int father[n];
-	khoitaomang(g,n);
-	khoitaomang(f,n);
+	khoitaomang(g,n,0);
+	khoitaomang(f,n,0);
+	khoitaomang(father,n,-1);
 	//Khoi tao
 	OPEN[dem++]=start;
 	
-	while(dem!=0){//Buoc 2.1
+	while(dem>=0){//Buoc 2.1
 		dem--;
 		u=OPEN[dem];//Buoc 2.2
 		printf("\nu=%d",u);
@@ -102,6 +103,7 @@ void nhanhcan(int start, int goal){
 						g[i]=g[u]+dinh[u][i];
 						f[i]=g[i]+h[i];				
 						L[demL++]=i;
+						father[i]=u;
 					}
 				}
 				printf("\nL chua sort:");inmang(L,demL);
@@ -141,11 +143,23 @@ void nhanhcan(int start, int goal){
 	}
 	//het while: dem=0
 	printf("\nKet thuc");
+	// Backtrack from goal to start to print the path
+    if (father[goal] == -1) {
+        printf("\nNo path from start to goal.\n");
+    } else {
+        printf("\nPath from start to goal: %d", goal);
+        int current = goal;
+        while (current != start) {
+            printf(" <- %d", father[current]);
+            current = father[current];
+        }
+        printf("\n");
+    }
 }
 
 
 int main(){
 	readfile();
-	nhanhcan(0,7);
+	nhanhcan(0,77);
 	return 0;
 }
