@@ -140,4 +140,7 @@ prove([[(a&b->c),(b&c->d),(a&b)]],[d]). %false
 prove([[(a->b),(a->c v e),(b & c->d),(f->d),(a)]],[g]).
 prove([(a -> b v d),(d -> e & f),(e & a -> !b)],[(a -> !d)]).  %false
 
+prove([[(p -> (q & r)),(q -> s), (r -> t)]],[[(s & t)]]).
+prove([[((a&b) -> c),((b & c) -> d), (a),(b)]],[[(d)]]).
+prove([[(!p v (q & r)),(!q & s),(!r & t)]],[[(s & t)]]).
 */

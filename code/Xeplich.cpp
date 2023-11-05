@@ -1,6 +1,8 @@
 #include<stdio.h>
 #define INPUT "Xeplich.inp"
-#define INPUT "Xeplich.inp2"
+//#define INPUT "Xeplich.inp2"
+//#define INPUT "Xeplich.inp3"
+//#define INPUT "Xeplich.inp4"
 #define maxmay 20
 #define maxcv 100
 

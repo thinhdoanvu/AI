@@ -1,7 +1,7 @@
 #include<stdio.h>
 #define MAX 100
-#define MTK "Astar_graph2.inp"
-#define H "Astar_graph2.h"
+#define MTK "Astar_GK.inp"
+#define H "Astar_GK.h"
 
 //khai bao bien
 FILE *fp;
@@ -124,7 +124,7 @@ void Astar(int start, int goal){
 							f[i]=tam_f;
 						}
 					}
-					else{
+					else{//khi code, chung ta lam truong hop nay truoc
 						//khong co dinh nao thuoc OPEN va CLOSE
 						g[i]=g[n]+mtk[n][i];
 						f[i]=g[i]+h[i];
@@ -164,6 +164,6 @@ int main(){
 	readfile_mtk();
 	printf("\nUoc luong chi phi:\n");
 	readfile_h();
-	Astar(0,10);
+	Astar(0,7);
 	return 0;
 }

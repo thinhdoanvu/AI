@@ -1,1 +1,2 @@
-Greedy_AT_H1.inp
+#define dinh_input "Astar_graph2.inp"
+#define h_input "Astar_graph2.h"
