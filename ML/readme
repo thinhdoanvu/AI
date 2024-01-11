@@ -104,7 +104,19 @@ LỖI: NameError: name 'trainloader' is not defined
 from download_data import trainloader, classes, batch_size
 SỬ DỤNG PYCHARM ĐỂ SỬA
 $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-LỖI BỎ QUA
+LỖI: The "freeze_support()" line can be omitted if the program
+        is not going to be frozen to produce an executable.
+***********************************
+SỬA:
+1. ngay sau: import torch
+chèn dòng: import torch.multiprocessing as mp
+2. chèn dòng mp.set_start_method('fork', force=True) ngay trước 
+# functions to show an image
+***********************************
+KẾT QUẢ: HÌnh + 
+Files already downloaded and verified
+Files already downloaded and verified
+frog  car   dog   plane
 
 !!!!!!!!!!!!!!!!!!!!!
 3. Tạo file python: cnn.py
@@ -144,3 +156,114 @@ from cnn import net
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+
+!!!!!!!!!!!!!!!!!!!!!
+4. Tạo file python: train.py
+!!!!!!!!!!!!!!!!!!!!!
+import torch
+import torch.multiprocessing as mp
+from cnn import net
+from download_data import trainloader
+from loss import optimizer, criterion
+
+# CẦN CÓ DÒNG NÀY
+mp.set_start_method('fork', force=True)
+
+for epoch in range(2):  # loop over the dataset multiple times
+
+    running_loss = 0.0
+    for i, data in enumerate(trainloader, 0):
+        # get the inputs; data is a list of [inputs, labels]
+        inputs, labels = data
+
+        # zero the parameter gradients
+        optimizer.zero_grad()
+
+        # forward + backward + optimize
+        outputs = net(inputs)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+
+        # print statistics
+        running_loss += loss.item()
+        if i % 2000 == 1999:    # print every 2000 mini-batches
+            print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 2000:.3f}')
+            running_loss = 0.0
+
+print('Finished Training')
+***********************************
+Kết quả:
+/Users/thinhdoanvu/anaconda3/envs/objectdetection/lib/python3.11/site-packages/torch/utils/data/_utils/worker.py:222: UserWarning: Cannot set number of intraop threads after parallel work has started or after set_num_threads call when using native parallel backend (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/ParallelNative.cpp:230.)
+  torch.set_num_threads(1)
+/Users/thinhdoanvu/anaconda3/envs/objectdetection/lib/python3.11/site-packages/torch/utils/data/_utils/worker.py:222: UserWarning: Cannot set number of intraop threads after parallel work has started or after set_num_threads call when using native parallel backend (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/ParallelNative.cpp:230.)
+  torch.set_num_threads(1)
+[1,  2000] loss: 2.246
+[1,  4000] loss: 1.874
+[1,  6000] loss: 1.676
+[1,  8000] loss: 1.585
+[1, 10000] loss: 1.536
+[1, 12000] loss: 1.456
+/Users/thinhdoanvu/anaconda3/envs/objectdetection/lib/python3.11/site-packages/torch/utils/data/_utils/worker.py:222: UserWarning: Cannot set number of intraop threads after parallel work has started or after set_num_threads call when using native parallel backend (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/ParallelNative.cpp:230.)
+  torch.set_num_threads(1)
+/Users/thinhdoanvu/anaconda3/envs/objectdetection/lib/python3.11/site-packages/torch/utils/data/_utils/worker.py:222: UserWarning: Cannot set number of intraop threads after parallel work has started or after set_num_threads call when using native parallel backend (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/ParallelNative.cpp:230.)
+  torch.set_num_threads(1)
+[2,  2000] loss: 1.392
+[2,  4000] loss: 1.375
+[2,  6000] loss: 1.340
+[2,  8000] loss: 1.316
+[2, 10000] loss: 1.289
+[2, 12000] loss: 1.278
+Finished Training
+
+Process finished with exit code 0
+
+!!!!!!!!!!!!!!!!!!!!!
+5. Test the network on the test data
+!!!!!!!!!!!!!!!!!!!!!
+Save train model: 
+***********************************
+PATH = './cifar_net.pth'
+torch.save(net.state_dict(), PATH)
+***********************************
+# Test the network on the test data
+***********************************
+dataiter = iter(testloader)
+images, labels = next(dataiter)
+
+# print images
+imshow(torchvision.utils.make_grid(images))
+print('GroundTruth: ', ' '.join(f'{classes[labels[j]]:5s}' for j in range(4)))
+***********************************
+Kết quả:
+GroundTruth:  cat   ship  ship  plane
+
+#####################################################################################
+##################### CHÚ Ý ĐOẠN NÀY: #################
+transform = transforms.Compose(
+    [transforms.ToTensor(),
+     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+batch_size = 4
+trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,shuffle=True, 
+num_workers=2)
+testset = torchvision.datasets.CIFAR10(root='./data', train=False,download=True, transform=transform)
+testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,shuffle=False, 
+num_workers=2)
+##################### 4=2+2 #################
+CHẠY TRÊN PC KHÔNG CÓ GPU LỖI LÒI ĐỜM
+LỖI: The "freeze_support()" line can be omitted if the program is not going to be frozen to produce an executable.
+
+SỬA 1: 
+1: ngay sau: import torch, chèn dòng: import torch.multiprocessing as mp
+2. ngay trước #functions to show an image, chèn dòng mp.set_start_method('fork', force=True) 
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+SỬA 2:
+batch_size = 0
+trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,shuffle=True, 
+num_workers=0)
+testset = torchvision.datasets.CIFAR10(root='./data', train=False,download=True, transform=transform)
+testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,shuffle=False, 
+num_workers=0)
