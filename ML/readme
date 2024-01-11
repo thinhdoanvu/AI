@@ -1,1 +1,146 @@
+1. Tạo môi trường trên anaconda từ Pycharm:
+  ## Pycharm - Setting - Python Interpriter
+    ## Add local environment - Conda Environment -
+      ## Conda Excutable: /Users/thinhdoanvu/anaconda3/bin/conda
+      ## Cretate environment: objectdetection
+      ## Python version: 3.11
+    ## OK (chờ add các môi trường)
 
+2. Kích hoạt (active) môi trường objectdetection: % conda activate objectdetection
+## (objectdetection) thinhdoanvu@Hac-Win-Dao ~ % 
+
+ĐỂ Ý: (base) với (objectdetection) trước tên máy.
+----------------------------------------------------
+| 3. Huỷ activate: conda deactivate (NẾU CẦN THIẾT)|
+----------------------------------------------------
+--------------------------------------------------------------------------------------
+Cài pytorch cho môi trường: objectdetection
+1. Truy cập: https://pytorch.org/
+2. INSTALL PYTORCH: lựa chọn các cấu hình cho môi trường objectdetection: Stable 2.1.2 + Mac + Pip + Python + Default.
+3. Copy câu lệnh sau: (objectdetection) thinhdoanvu@Hac-Win-Dao ~ % pip3 install torch torchvision torchaudio
+LƯU Ý: cài trong môi trường này.
+Installing collected packages: mpmath, urllib3, typing-extensions, sympy, pillow, numpy, networkx, MarkupSafe, idna, fsspec, filelock, charset-normalizer, certifi, requests, jinja2, torch, torchvision, torchaudio
+...
+---------------------------------------------------------------------------------------
+Truy cập: https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html
+!!!!!!!!!!!!!!!!!!!!!
+1. Tạo file python - LOad data:
+!!!!!!!!!!!!!!!!!!!!!
+  Pycharm - New Project - 
+    ## Name: pytorch
+    ## Location: /Users/thinhdoanvu/anaconda3/envs/objectdetection
+    ## Interpreter type: Custom environment
+    ## Environment: Select existing
+    ## Type: Conda
+    ## Path to conda: /Users/thinhdoanvu/anaconda3/bin/conda
+    ## Environment: objectdetection
+  Create
+  Click Scratches and Consoles - Scratches - scratch.py
+*************************************
+* scratch.py DRAG TO pytorch FOLDER *
+*************************************
+------------------------------------------------------------------------------------------
+Code:
+--------------------------
+## Using torchvision, it’s extremely easy to load CIFAR10.
+--------------------------
+import torch
+import torchvision
+import torchvision.transforms as transforms
+--------------------------
+## Load data via code:
+--------------------------
+transform = transforms.Compose(
+    [transforms.ToTensor(),
+     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+batch_size = 4
+trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=2)
+testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=2)
+classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+------------------------------
+## /Users/thinhdoanvu/anaconda3/envs/objectdetection/bin/python /Users/thinhdoanvu/Library/Application Support/JetBrains/PyCharm2023.3/scratches/scratch.py 
+## Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
+## RUN: xx.x%
+------------------------------
+100.0%
+Extracting ./data/cifar-10-python.tar.gz to ./data
+Files already downloaded and verified
+Process finished with exit code 0
+----------------------------------
+trong thư mục pytorch có tập tin sratch.py và folder data.
+-> rename: sratch.py -> download_data.py
+-----------------------------------
+
+!!!!!!!!!!!!!!!!!!!!!
+2. Tạo file python: image_show.py
+!!!!!!!!!!!!!!!!!!!!!
+(objectdetection) thinhdoanvu@Hac-Win-Dao pytorch % touch image_show.py
+----------------------------------
+Code:
+----------------------------------
+import matplotlib.pyplot as plt
+import numpy as np
+# functions to show an image
+def imshow(img):
+    img = img / 2 + 0.5     # unnormalize
+    npimg = img.numpy()
+    plt.imshow(np.transpose(npimg, (1, 2, 0)))
+    plt.show()
+# get some random training images
+dataiter = iter(trainloader)
+images, labels = next(dataiter)
+# show images
+imshow(torchvision.utils.make_grid(images))
+# print labels
+print(' '.join(f'{classes[labels[j]]:5s}' for j in range(batch_size)))
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+LỖI: ModuleNotFoundError: No module named 'matplotlib'
+(objectdetection) thinhdoanvu@Hac-Win-Dao pytorch % pip3 instal matplotlib
+Successfully installed contourpy-1.2.0 cycler-0.12.1 fonttools-4.47.2 kiwisolver-1.4.5 matplotlib-3.8.2 packaging-23.2 pyparsing-3.1.1 python-dateutil-2.8.2 six-1.16.0
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+LỖI: NameError: name 'trainloader' is not defined
+from download_data import trainloader, classes, batch_size
+SỬ DỤNG PYCHARM ĐỂ SỬA
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+LỖI BỎ QUA
+
+!!!!!!!!!!!!!!!!!!!!!
+3. Tạo file python: cnn.py
+!!!!!!!!!!!!!!!!!!!!!
+Convolutional Neural Network
+import torch.nn as nn
+import torch.nn.functional as F
+
+class Net(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(3, 6, 5)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.fc1 = nn.Linear(16 * 5 * 5, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, 10)
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = torch.flatten(x, 1) # flatten all dimensions except batch
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
+
+net = Net()
+
+!!!!!!!!!!!!!!!!!!!!!
+4. Tạo file python: loss.py
+!!!!!!!!!!!!!!!!!!!!!
+import torch.optim as optim
+from torch import nn
+
+from cnn import net
+
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
