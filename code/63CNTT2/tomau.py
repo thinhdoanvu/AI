@@ -7,61 +7,63 @@ def readmtk(filename):
             line = list(map(int, f.readline().split()))
             print(line)
             adj.append(line)
-    return sodinh, adj
+    return adj,sodinh
 
-def timbac(sodinh,adj):
-    d = [0]*sodinh
+def tomau(sodinh,adj):
+    bac = [0]*sodinh
     for i in range(sodinh):
         for j in range(sodinh):
-            if adj[i][j] == 1:
-                d[i]+=1
-    print(f"bac cua do thi: {d}")
-    return d
+            if adj[i][j]==1:
+                bac[i]+=1
+    print(f"bac do thi: {bac}")
     
-def tomau(sodinh, adj, d):
-    # print(adj)
-    dinh=[]
-    mamau = 0
-    # CLOSE = []
-    
+    # tao ra danh sach cac dinh 
+    OPEN = []
     for i in range(sodinh):
-        dinh.append(i)
+        OPEN.append(i)
+    print(f"OPEN = {OPEN}")
+    
+    # sap xep cac dinh giam dan theo bac 
+    OPEN = sorted(OPEN, key=lambda x: bac[x], reverse = True)
+    print(f"OPEN sorted by bac: {OPEN}")
+    
+    # tao ra danh sach mau theo dinh
     color = [-1]*sodinh
     print(f"color = {color}")
     
-    dinh = sorted(dinh, key = lambda x: d[x], reverse = True)
-    print(f"dinh giam dan theo bac: {dinh}")
-    
-    while len(dinh)>0:
-        n = dinh.pop(0)
+    # to cho den khi het dinh 
+    mau=0
+    while len(OPEN)>0:
+        n = OPEN.pop(0)
         print(f"n = {n}")
-        # CLOSE.append(n)
-        # print(f"CLOSE = {CLOSE}")
-        color[n] = mamau
-        # tim cac dinh khong ke voi n, chua to mau
-        flag = []
-        for i in range(sodinh):
-            if adj[n][i] == 0 and color[i] == -1:
-                color[i] = mamau 
-                flag.append(i)
-        mamau +=1 # tang mamau len mau ke tiep
-        print(f"tap cac dinh khong ke voi {n} la: {flag}")
+        color[n] = mau
         
-        # xoa cac dinh chua to mau nhung ke nhau, gan color = -1
-        for i in range(len(flag)):
-            for j in range(i+1,len(flag)):
-                if adj[flag[i]][flag[j]] == 1: # co 2 dinh ke nhau trong tap chua to 
-                    print(flag[j])
-                    color[flag[j]] = -1
-                    
-        # xoa cac dinh da tomau
-        for i in flag:
-            if i in dinh:
-                dinh.remove(i)
+        # tim cac dinh khong ke voi n va chua duoc to mau 
+        Tn=[]
+        for i in range(sodinh):
+            if adj[n][i]==0 and color[i]==-1:
+                Tn.append(i)
+        print(f"cac dinh khong ke voi {n} va chua to mau {Tn}")
+        
+        # xoa cac dinh ke nhau trong Tn
+        for i in Tn:
+            for j in Tn:
+                if i!=j and adj[i][j]==1:
+                    Tn.remove(j)
+            print(f"Tn sau khi xoa dinh ke nha: {Tn}")
+            
+        # to mau cho cac dinh trong Tn
+        for i in Tn:
+            color[i] = mau
+            OPEN.remove(i)
         print(f"color = {color}")
-    return True
+        
+        # tang mau cho dinh tiep theo
+        mau+=1
+    # het dinh:
+    print(f"danh sach cac dinh theo mau to: {color}")
+    
 
-if __name__ == "__main__":
-    sodinh, adj = readmtk("tomau.mtk")
-    d = timbac(sodinh,adj)
-    tomau(sodinh,adj,d)
+if __name__=="__main__":
+    adj,sodinh = readmtk("tomau.adj")
+    tomau(sodinh,adj)
